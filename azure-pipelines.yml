@@ -1,19 +1,39 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- main
+- main     # or master depending on your GitHub branch
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'windows-latest'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+# Install .NET 8 SDK
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '8.x'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+# Restore project
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'restore'
+    projects: '**/*.csproj'
+
+# Build project
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '**/*.csproj'
+    arguments: '--configuration Release'
+
+# Publish project (optional but recommended)
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '**/*.csproj'
+    arguments: '-c Release -o $(Build.ArtifactStagingDirectory)'
+
+# Upload artifacts
+- task: PublishBuildArtifacts@1
+  inputs:
+    artifactName: 'drop'
+    targetPath: '$(Build.ArtifactStagingDirectory)'
