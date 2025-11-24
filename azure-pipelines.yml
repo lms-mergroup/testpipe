@@ -5,6 +5,11 @@ pool:
   vmImage: 'windows-latest'
 
 steps:
+- bash: |
+    echo "Hello from Bash"
+    ls -la
+  displayName: "Run Bash Commands"
+
 # Install .NET 8 SDK
 - task: UseDotNet@2
   inputs:
